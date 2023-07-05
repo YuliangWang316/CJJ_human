@@ -24,6 +24,7 @@ Total<-rbind(NB,DN,DP,PC)
 Cellratio <- prop.table(table(Total$c_gene, Total$group), margin = 2)
 
 Cellratio <- as.data.frame(Cellratio)
+Cellratio$Var2<-factor(Cellratio$Var2,levels = c("NB","DN","DP","PC"))
 colourCount = length(unique(Cellratio$Var1))
 library(ggplot2)
 ggplot(Cellratio) + 

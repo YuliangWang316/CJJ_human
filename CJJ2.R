@@ -471,6 +471,7 @@ DN_result_igblast<-cbind(DN_result,DN_igblast)
 DP_result_igblast<-cbind(DP_result,DP_igblast)
 PC_result_igblast<-cbind(PC_result,PC_igblast)
 Total_result_igblast<-rbind(DN_result_igblast,DP_result_igblast,PC_result_igblast)
+
 Total_result_igblast_IGHG1<-Total_result_igblast[which(Total_result_igblast$c_gene == "IGHG1"),]
 DN_igblast_IGHG1_vgene<-Total_result_igblast_IGHG1[which(Total_result_igblast_IGHG1$group == "DN" ),]
 DP_igblast_IGHG1_vgene<-Total_result_igblast_IGHG1[which(Total_result_igblast_IGHG1$group == "DP" ),]
@@ -523,4 +524,323 @@ ggplot(PC_DN_same_IGHG1_Cellratio) +
   labs(x='Sample',y = 'Ratio')+
   # coord_flip()+
   theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+
+Total_result_igblast_IGHG2<-Total_result_igblast[which(Total_result_igblast$c_gene == "IGHG2"),]
+DN_igblast_IGHG2_vgene<-Total_result_igblast_IGHG2[which(Total_result_igblast_IGHG2$group == "DN" ),]
+DP_igblast_IGHG2_vgene<-Total_result_igblast_IGHG2[which(Total_result_igblast_IGHG2$group == "DP" ),]
+PC_igblast_IGHG2_vgene<-Total_result_igblast_IGHG2[which(Total_result_igblast_IGHG2$group == "PC" ),]
+
+PC_DP_IGHG2_overlapVgene<-intersect(PC_igblast_IGHG2_vgene$v_sequence_alignment,DP_igblast_IGHG2_vgene$v_sequence_alignment)
+PC_DN_IGHG2_overlapVgene<-intersect(PC_igblast_IGHG2_vgene$v_sequence_alignment,DN_igblast_IGHG2_vgene$v_sequence_alignment)
+
+PC_DP_result_igblast_IGHG2<-Total_result_igblast_IGHG2[which(Total_result_igblast_IGHG2$group == "DP" | Total_result_igblast_IGHG2$group == "PC"),]
+PC_DN_result_igblast_IGHG2<-Total_result_igblast_IGHG2[which(Total_result_igblast_IGHG2$group == "DN" | Total_result_igblast_IGHG2$group == "PC"),]
+
+PC_DP_result_igblast_IGHG2$Hits<-"No_Hit"
+PC_DN_result_igblast_IGHG2$Hits<-"No_Hit"
+
+for (i in 1:length(PC_DP_IGHG2_overlapVgene)) {
+  for (j in 1:length(rownames(PC_DP_result_igblast_IGHG2))) {
+    
+    if(PC_DP_IGHG2_overlapVgene[i] ==  PC_DP_result_igblast_IGHG2$v_sequence_alignment[j] ){
+      PC_DP_result_igblast_IGHG2$Hits[j]<-"Hit"      
+    }
+  }
+  
+}
+
+
+for (i in length(PC_DN_IGHG2_overlapVgene)) {
+  for (j in 1:length(rownames(PC_DN_result_igblast_IGHG2))) {
+    
+    if(PC_DN_IGHG2_overlapVgene[i] == PC_DN_result_igblast_IGHG2$v_sequence_alignment[j]){
+      PC_DN_result_igblast_IGHG2$Hits[j]<-"Hit"      
+    }
+  }
+  
+}
+PC_DP_same_IGHG2_Cellratio <- as.data.frame(prop.table(table(PC_DP_result_igblast_IGHG2$Hits, PC_DP_result_igblast_IGHG2$group), margin = 2))
+colourCount = length(unique(PC_DP_same_IGHG2_Cellratio$Var1))
+library(ggplot2)
+ggplot(PC_DP_same_IGHG2_Cellratio) + 
+  geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+  theme_classic() +
+  labs(x='Sample',y = 'Ratio')+
+  # coord_flip()+
+  theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+PC_DN_same_IGHG2_Cellratio <- as.data.frame(prop.table(table(PC_DN_result_igblast_IGHG2$Hits, PC_DN_result_igblast_IGHG2$group), margin = 2))
+colourCount = length(unique(PC_DN_same_IGHG2_Cellratio$Var1))
+library(ggplot2)
+ggplot(PC_DN_same_IGHG2_Cellratio) + 
+  geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+  theme_classic() +
+  labs(x='Sample',y = 'Ratio')+
+  # coord_flip()+
+  theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+
+# Total_result_igblast_IGHG3<-Total_result_igblast[which(Total_result_igblast$c_gene == "IGHG3"),]
+# DN_igblast_IGHG3_vgene<-Total_result_igblast_IGHG3[which(Total_result_igblast_IGHG3$group == "DN" ),]
+# DP_igblast_IGHG3_vgene<-Total_result_igblast_IGHG3[which(Total_result_igblast_IGHG3$group == "DP" ),]
+# PC_igblast_IGHG3_vgene<-Total_result_igblast_IGHG3[which(Total_result_igblast_IGHG3$group == "PC" ),]
+# 
+# PC_DP_IGHG3_overlapVgene<-intersect(PC_igblast_IGHG3_vgene$v_sequence_alignment,DP_igblast_IGHG3_vgene$v_sequence_alignment)
+# PC_DN_IGHG3_overlapVgene<-intersect(PC_igblast_IGHG3_vgene$v_sequence_alignment,DN_igblast_IGHG3_vgene$v_sequence_alignment)
+# 
+# PC_DP_result_igblast_IGHG3<-Total_result_igblast_IGHG3[which(Total_result_igblast_IGHG3$group == "DP" | Total_result_igblast_IGHG3$group == "PC"),]
+# PC_DN_result_igblast_IGHG3<-Total_result_igblast_IGHG3[which(Total_result_igblast_IGHG3$group == "DN" | Total_result_igblast_IGHG3$group == "PC"),]
+# 
+# PC_DP_result_igblast_IGHG3$Hits<-"No_Hit"
+# PC_DN_result_igblast_IGHG3$Hits<-"No_Hit"
+# 
+# for (i in 1:length(PC_DP_IGHG3_overlapVgene)) {
+#   for (j in 1:length(rownames(PC_DP_result_igblast_IGHG3))) {
+#     
+#     if(PC_DP_IGHG3_overlapVgene[i] ==  PC_DP_result_igblast_IGHG3$v_sequence_alignment[j] ){
+#       PC_DP_result_igblast_IGHG3$Hits[j]<-"Hit"      
+#     }
+#   }
+#   
+# }
+# 
+# 
+# for (i in length(PC_DN_IGHG3_overlapVgene)) {
+#   for (j in 1:length(rownames(PC_DN_result_igblast_IGHG3))) {
+#     
+#     if(PC_DN_IGHG3_overlapVgene[i] == PC_DN_result_igblast_IGHG3$v_sequence_alignment[j]){
+#       PC_DN_result_igblast_IGHG3$Hits[j]<-"Hit"      
+#     }
+#   }
+#   
+# }
+# PC_DP_same_IGHG3_Cellratio <- as.data.frame(prop.table(table(PC_DP_result_igblast_IGHG3$Hits, PC_DP_result_igblast_IGHG3$group), margin = 2))
+# colourCount = length(unique(PC_DP_same_IGHG3_Cellratio$Var1))
+# library(ggplot2)
+# ggplot(PC_DP_same_IGHG3_Cellratio) + 
+#   geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+#   theme_classic() +
+#   labs(x='Sample',y = 'Ratio')+
+#   # coord_flip()+
+#   theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+# PC_DN_same_IGHG3_Cellratio <- as.data.frame(prop.table(table(PC_DN_result_igblast_IGHG3$Hits, PC_DN_result_igblast_IGHG3$group), margin = 2))
+# colourCount = length(unique(PC_DN_same_IGHG3_Cellratio$Var1))
+# library(ggplot2)
+# ggplot(PC_DN_same_IGHG3_Cellratio) + 
+#   geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+#   theme_classic() +
+#   labs(x='Sample',y = 'Ratio')+
+#   # coord_flip()+
+#   theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+# 
+# Total_result_igblast_IGHG4<-Total_result_igblast[which(Total_result_igblast$c_gene == "IGHG4"),]
+# DN_igblast_IGHG4_vgene<-Total_result_igblast_IGHG4[which(Total_result_igblast_IGHG4$group == "DN" ),]
+# DP_igblast_IGHG4_vgene<-Total_result_igblast_IGHG4[which(Total_result_igblast_IGHG4$group == "DP" ),]
+# PC_igblast_IGHG4_vgene<-Total_result_igblast_IGHG4[which(Total_result_igblast_IGHG4$group == "PC" ),]
+# 
+# PC_DP_IGHG4_overlapVgene<-intersect(PC_igblast_IGHG4_vgene$v_sequence_alignment,DP_igblast_IGHG4_vgene$v_sequence_alignment)
+# PC_DN_IGHG4_overlapVgene<-intersect(PC_igblast_IGHG4_vgene$v_sequence_alignment,DN_igblast_IGHG4_vgene$v_sequence_alignment)
+# 
+# PC_DP_result_igblast_IGHG4<-Total_result_igblast_IGHG4[which(Total_result_igblast_IGHG4$group == "DP" | Total_result_igblast_IGHG4$group == "PC"),]
+# PC_DN_result_igblast_IGHG4<-Total_result_igblast_IGHG4[which(Total_result_igblast_IGHG4$group == "DN" | Total_result_igblast_IGHG4$group == "PC"),]
+# 
+# PC_DP_result_igblast_IGHG4$Hits<-"No_Hit"
+# PC_DN_result_igblast_IGHG4$Hits<-"No_Hit"
+# 
+# for (i in 1:length(PC_DP_IGHG4_overlapVgene)) {
+#   for (j in 1:length(rownames(PC_DP_result_igblast_IGHG4))) {
+#     
+#     if(PC_DP_IGHG4_overlapVgene[i] ==  PC_DP_result_igblast_IGHG4$v_sequence_alignment[j] ){
+#       PC_DP_result_igblast_IGHG4$Hits[j]<-"Hit"      
+#     }
+#   }
+#   
+# }
+# 
+# 
+# for (i in length(PC_DN_IGHG4_overlapVgene)) {
+#   for (j in 1:length(rownames(PC_DN_result_igblast_IGHG4))) {
+#     
+#     if(PC_DN_IGHG4_overlapVgene[i] == PC_DN_result_igblast_IGHG4$v_sequence_alignment[j]){
+#       PC_DN_result_igblast_IGHG4$Hits[j]<-"Hit"      
+#     }
+#   }
+#   
+# }
+# PC_DP_same_IGHG4_Cellratio <- as.data.frame(prop.table(table(PC_DP_result_igblast_IGHG4$Hits, PC_DP_result_igblast_IGHG4$group), margin = 2))
+# colourCount = length(unique(PC_DP_same_IGHG4_Cellratio$Var1))
+# library(ggplot2)
+# ggplot(PC_DP_same_IGHG4_Cellratio) + 
+#   geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+#   theme_classic() +
+#   labs(x='Sample',y = 'Ratio')+
+#   # coord_flip()+
+#   theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+# PC_DN_same_IGHG4_Cellratio <- as.data.frame(prop.table(table(PC_DN_result_igblast_IGHG4$Hits, PC_DN_result_igblast_IGHG4$group), margin = 2))
+# colourCount = length(unique(PC_DN_same_IGHG4_Cellratio$Var1))
+# library(ggplot2)
+# ggplot(PC_DN_same_IGHG4_Cellratio) + 
+#   geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+#   theme_classic() +
+#   labs(x='Sample',y = 'Ratio')+
+#   # coord_flip()+
+#   theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+
+Total_result_igblast_IGHA1<-Total_result_igblast[which(Total_result_igblast$c_gene == "IGHA1"),]
+DN_igblast_IGHA1_vgene<-Total_result_igblast_IGHA1[which(Total_result_igblast_IGHA1$group == "DN" ),]
+DP_igblast_IGHA1_vgene<-Total_result_igblast_IGHA1[which(Total_result_igblast_IGHA1$group == "DP" ),]
+PC_igblast_IGHA1_vgene<-Total_result_igblast_IGHA1[which(Total_result_igblast_IGHA1$group == "PC" ),]
+
+PC_DP_IGHA1_overlapVgene<-intersect(PC_igblast_IGHA1_vgene$v_sequence_alignment,DP_igblast_IGHA1_vgene$v_sequence_alignment)
+PC_DN_IGHA1_overlapVgene<-intersect(PC_igblast_IGHA1_vgene$v_sequence_alignment,DN_igblast_IGHA1_vgene$v_sequence_alignment)
+
+PC_DP_result_igblast_IGHA1<-Total_result_igblast_IGHA1[which(Total_result_igblast_IGHA1$group == "DP" | Total_result_igblast_IGHA1$group == "PC"),]
+PC_DN_result_igblast_IGHA1<-Total_result_igblast_IGHA1[which(Total_result_igblast_IGHA1$group == "DN" | Total_result_igblast_IGHA1$group == "PC"),]
+
+PC_DP_result_igblast_IGHA1$Hits<-"No_Hit"
+PC_DN_result_igblast_IGHA1$Hits<-"No_Hit"
+
+for (i in 1:length(PC_DP_IGHA1_overlapVgene)) {
+  for (j in 1:length(rownames(PC_DP_result_igblast_IGHA1))) {
+    
+    if(PC_DP_IGHA1_overlapVgene[i] ==  PC_DP_result_igblast_IGHA1$v_sequence_alignment[j] ){
+      PC_DP_result_igblast_IGHA1$Hits[j]<-"Hit"      
+    }
+  }
+  
+}
+
+
+for (i in length(PC_DN_IGHA1_overlapVgene)) {
+  for (j in 1:length(rownames(PC_DN_result_igblast_IGHA1))) {
+    
+    if(PC_DN_IGHA1_overlapVgene[i] == PC_DN_result_igblast_IGHA1$v_sequence_alignment[j]){
+      PC_DN_result_igblast_IGHA1$Hits[j]<-"Hit"      
+    }
+  }
+  
+}
+PC_DP_same_IGHA1_Cellratio <- as.data.frame(prop.table(table(PC_DP_result_igblast_IGHA1$Hits, PC_DP_result_igblast_IGHA1$group), margin = 2))
+colourCount = length(unique(PC_DP_same_IGHA1_Cellratio$Var1))
+library(ggplot2)
+ggplot(PC_DP_same_IGHA1_Cellratio) + 
+  geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+  theme_classic() +
+  labs(x='Sample',y = 'Ratio')+
+  # coord_flip()+
+  theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+PC_DN_same_IGHA1_Cellratio <- as.data.frame(prop.table(table(PC_DN_result_igblast_IGHA1$Hits, PC_DN_result_igblast_IGHA1$group), margin = 2))
+colourCount = length(unique(PC_DN_same_IGHA1_Cellratio$Var1))
+library(ggplot2)
+ggplot(PC_DN_same_IGHA1_Cellratio) + 
+  geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+  theme_classic() +
+  labs(x='Sample',y = 'Ratio')+
+  # coord_flip()+
+  theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+
+# Total_result_igblast_IGHA2<-Total_result_igblast[which(Total_result_igblast$c_gene == "IGHA2"),]
+# DN_igblast_IGHA2_vgene<-Total_result_igblast_IGHA2[which(Total_result_igblast_IGHA2$group == "DN" ),]
+# DP_igblast_IGHA2_vgene<-Total_result_igblast_IGHA2[which(Total_result_igblast_IGHA2$group == "DP" ),]
+# PC_igblast_IGHA2_vgene<-Total_result_igblast_IGHA2[which(Total_result_igblast_IGHA2$group == "PC" ),]
+# 
+# PC_DP_IGHA2_overlapVgene<-intersect(PC_igblast_IGHA2_vgene$v_sequence_alignment,DP_igblast_IGHA2_vgene$v_sequence_alignment)
+# PC_DN_IGHA2_overlapVgene<-intersect(PC_igblast_IGHA2_vgene$v_sequence_alignment,DN_igblast_IGHA2_vgene$v_sequence_alignment)
+# 
+# PC_DP_result_igblast_IGHA2<-Total_result_igblast_IGHA2[which(Total_result_igblast_IGHA2$group == "DP" | Total_result_igblast_IGHA2$group == "PC"),]
+# PC_DN_result_igblast_IGHA2<-Total_result_igblast_IGHA2[which(Total_result_igblast_IGHA2$group == "DN" | Total_result_igblast_IGHA2$group == "PC"),]
+# 
+# PC_DP_result_igblast_IGHA2$Hits<-"No_Hit"
+# PC_DN_result_igblast_IGHA2$Hits<-"No_Hit"
+# 
+# for (i in 1:length(PC_DP_IGHA2_overlapVgene)) {
+#   for (j in 1:length(rownames(PC_DP_result_igblast_IGHA2))) {
+#     
+#     if(PC_DP_IGHA2_overlapVgene[i] ==  PC_DP_result_igblast_IGHA2$v_sequence_alignment[j] ){
+#       PC_DP_result_igblast_IGHA2$Hits[j]<-"Hit"      
+#     }
+#   }
+#   
+# }
+# 
+# 
+# for (i in length(PC_DN_IGHA2_overlapVgene)) {
+#   for (j in 1:length(rownames(PC_DN_result_igblast_IGHA2))) {
+#     
+#     if(PC_DN_IGHA2_overlapVgene[i] == PC_DN_result_igblast_IGHA2$v_sequence_alignment[j]){
+#       PC_DN_result_igblast_IGHA2$Hits[j]<-"Hit"      
+#     }
+#   }
+#   
+# }
+# PC_DP_same_IGHA2_Cellratio <- as.data.frame(prop.table(table(PC_DP_result_igblast_IGHA2$Hits, PC_DP_result_igblast_IGHA2$group), margin = 2))
+# colourCount = length(unique(PC_DP_same_IGHA2_Cellratio$Var1))
+# library(ggplot2)
+# ggplot(PC_DP_same_IGHA2_Cellratio) + 
+#   geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+#   theme_classic() +
+#   labs(x='Sample',y = 'Ratio')+
+#   # coord_flip()+
+#   theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+# PC_DN_same_IGHA2_Cellratio <- as.data.frame(prop.table(table(PC_DN_result_igblast_IGHA2$Hits, PC_DN_result_igblast_IGHA2$group), margin = 2))
+# colourCount = length(unique(PC_DN_same_IGHA2_Cellratio$Var1))
+# library(ggplot2)
+# ggplot(PC_DN_same_IGHA2_Cellratio) + 
+#   geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+#   theme_classic() +
+#   labs(x='Sample',y = 'Ratio')+
+#   # coord_flip()+
+#   theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+
+Total_result_igblastTotal<-Total_result_igblast[which(Total_result_igblast$c_gene != ""),]
+DN_igblastTotal_vgene<-Total_result_igblastTotal[which(Total_result_igblastTotal$group == "DN" ),]
+DP_igblastTotal_vgene<-Total_result_igblastTotal[which(Total_result_igblastTotal$group == "DP" ),]
+PC_igblastTotal_vgene<-Total_result_igblastTotal[which(Total_result_igblastTotal$group == "PC" ),]
+
+PC_DPTotal_overlapVgene<-intersect(PC_igblastTotal_vgene$v_sequence_alignment,DP_igblastTotal_vgene$v_sequence_alignment)
+PC_DNTotal_overlapVgene<-intersect(PC_igblastTotal_vgene$v_sequence_alignment,DN_igblastTotal_vgene$v_sequence_alignment)
+
+PC_DP_result_igblastTotal<-Total_result_igblastTotal[which(Total_result_igblastTotal$group == "DP" | Total_result_igblastTotal$group == "PC"),]
+PC_DN_result_igblastTotal<-Total_result_igblastTotal[which(Total_result_igblastTotal$group == "DN" | Total_result_igblastTotal$group == "PC"),]
+
+PC_DP_result_igblastTotal$Hits<-"No_Hit"
+PC_DN_result_igblastTotal$Hits<-"No_Hit"
+
+for (i in 1:length(PC_DPTotal_overlapVgene)) {
+  for (j in 1:length(rownames(PC_DP_result_igblastTotal))) {
+    
+    if(PC_DPTotal_overlapVgene[i] ==  PC_DP_result_igblastTotal$v_sequence_alignment[j] ){
+      PC_DP_result_igblastTotal$Hits[j]<-"Hit"      
+    }
+  }
+  
+}
+
+
+for (i in length(PC_DNTotal_overlapVgene)) {
+  for (j in 1:length(rownames(PC_DN_result_igblastTotal))) {
+    
+    if(PC_DNTotal_overlapVgene[i] == PC_DN_result_igblastTotal$v_sequence_alignment[j]){
+      PC_DN_result_igblastTotal$Hits[j]<-"Hit"      
+    }
+  }
+  
+}
+PC_DP_sameTotal_Cellratio <- as.data.frame(prop.table(table(PC_DP_result_igblastTotal$Hits, PC_DP_result_igblastTotal$group), margin = 2))
+colourCount = length(unique(PC_DP_sameTotal_Cellratio$Var1))
+library(ggplot2)
+ggplot(PC_DP_sameTotal_Cellratio) + 
+  geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+  theme_classic() +
+  labs(x='Sample',y = 'Ratio')+
+  # coord_flip()+
+  theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+PC_DN_sameTotal_Cellratio <- as.data.frame(prop.table(table(PC_DN_result_igblastTotal$Hits, PC_DN_result_igblastTotal$group), margin = 2))
+colourCount = length(unique(PC_DN_sameTotal_Cellratio$Var1))
+library(ggplot2)
+ggplot(PC_DN_sameTotal_Cellratio) + 
+  geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+  theme_classic() +
+  labs(x='Sample',y = 'Ratio')+
+  # coord_flip()+
+  theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+
 

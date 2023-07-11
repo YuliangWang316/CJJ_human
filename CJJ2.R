@@ -437,12 +437,14 @@ PC_result$Total_unidentify<-PC_result$Total - PC_result$Total_identity
 Total<-rbind(DN_result,DP_result,NB_result,PC_result)
 Total<-Total[Total$c_gene != "",]
 Total$group<-factor(Total$group,levels = c("NB","DN","DP","PC"))
+Total<-Total[which(Total$c_gene == "IGHA1" | Total$c_gene == "IGHA2" | Total$c_gene == "IGHG1" | Total$c_gene == "IGHG2" | Total$c_gene == "IGHG3" | Total$c_gene == "IGHG4" | Total$c_gene == "IGHM" ),]
+Total$c_gene<-factor(Total$c_gene,levels = c("IGHM","IGHA1","IGHA2","IGHG1","IGHG2","IGHG3","IGHG4"))
 
 library(ggplot2)
 library(ggprism)
 ggplot(data = Total, aes(x = c_gene, y = Total_unidentify, fill = group)) +
-  geom_violin()+
-  geom_boxplot()+
+   geom_violin()+
+   geom_boxplot()+
   theme_prism()+
   scale_color_manual(values = brewer.pal(9,"Set1")[3:8])
 DP_IGHG1<-DP_result[DP_result$c_gene == "IGHG1",]
@@ -790,7 +792,7 @@ ggplot(PC_DN_same_IGHA1_Cellratio) +
 #   # coord_flip()+
 #   theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
 
-Total_result_igblastTotal<-Total_result_igblast[which(Total_result_igblast$c_gene != ""),]
+Total_result_igblastTotal<-Total_result_igblast[which(Total_result_igblast$c_gene == "IGHA1" | Total_result_igblast$c_gene == "IGHA2" | Total_result_igblast$c_gene == "IGHG1" | Total_result_igblast$c_gene == "IGHG2" | Total_result_igblast$c_gene == "IGHG3" | Total_result_igblast$c_gene == "IGHG4" | Total_result_igblast$c_gene == "IGHM" ),]
 DN_igblastTotal_vgene<-Total_result_igblastTotal[which(Total_result_igblastTotal$group == "DN" ),]
 DP_igblastTotal_vgene<-Total_result_igblastTotal[which(Total_result_igblastTotal$group == "DP" ),]
 PC_igblastTotal_vgene<-Total_result_igblastTotal[which(Total_result_igblastTotal$group == "PC" ),]
@@ -843,4 +845,55 @@ ggplot(PC_DN_sameTotal_Cellratio) +
   # coord_flip()+
   theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
 
+Total_result_igblast_IGHM<-Total_result_igblast[which(Total_result_igblast$c_gene == "IGHM"),]
+DN_igblast_IGHM_vgene<-Total_result_igblast_IGHM[which(Total_result_igblast_IGHM$group == "DN" ),]
+DP_igblast_IGHM_vgene<-Total_result_igblast_IGHM[which(Total_result_igblast_IGHM$group == "DP" ),]
+PC_igblast_IGHM_vgene<-Total_result_igblast_IGHM[which(Total_result_igblast_IGHM$group == "PC" ),]
 
+PC_DP_IGHM_overlapVgene<-intersect(PC_igblast_IGHM_vgene$v_sequence_alignment,DP_igblast_IGHM_vgene$v_sequence_alignment)
+PC_DN_IGHM_overlapVgene<-intersect(PC_igblast_IGHM_vgene$v_sequence_alignment,DN_igblast_IGHM_vgene$v_sequence_alignment)
+
+PC_DP_result_igblast_IGHM<-Total_result_igblast_IGHM[which(Total_result_igblast_IGHM$group == "DP" | Total_result_igblast_IGHM$group == "PC"),]
+PC_DN_result_igblast_IGHM<-Total_result_igblast_IGHM[which(Total_result_igblast_IGHM$group == "DN" | Total_result_igblast_IGHM$group == "PC"),]
+
+PC_DP_result_igblast_IGHM$Hits<-"No_Hit"
+PC_DN_result_igblast_IGHM$Hits<-"No_Hit"
+
+for (i in 1:length(PC_DP_IGHM_overlapVgene)) {
+  for (j in 1:length(rownames(PC_DP_result_igblast_IGHM))) {
+    
+    if(PC_DP_IGHM_overlapVgene[i] ==  PC_DP_result_igblast_IGHM$v_sequence_alignment[j] ){
+      PC_DP_result_igblast_IGHM$Hits[j]<-"Hit"      
+    }
+  }
+  
+}
+
+
+for (i in length(PC_DN_IGHM_overlapVgene)) {
+  for (j in 1:length(rownames(PC_DN_result_igblast_IGHM))) {
+    
+    if(PC_DN_IGHM_overlapVgene[i] == PC_DN_result_igblast_IGHM$v_sequence_alignment[j]){
+      PC_DN_result_igblast_IGHM$Hits[j]<-"Hit"      
+    }
+  }
+  
+}
+PC_DP_same_IGHM_Cellratio <- as.data.frame(prop.table(table(PC_DP_result_igblast_IGHM$Hits, PC_DP_result_igblast_IGHM$group), margin = 2))
+colourCount = length(unique(PC_DP_same_IGHM_Cellratio$Var1))
+library(ggplot2)
+ggplot(PC_DP_same_IGHM_Cellratio) + 
+  geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+  theme_classic() +
+  labs(x='Sample',y = 'Ratio')+
+  # coord_flip()+
+  theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+PC_DN_same_IGHM_Cellratio <- as.data.frame(prop.table(table(PC_DN_result_igblast_IGHM$Hits, PC_DN_result_igblast_IGHM$group), margin = 2))
+colourCount = length(unique(PC_DN_same_IGHM_Cellratio$Var1))
+library(ggplot2)
+ggplot(PC_DN_same_IGHM_Cellratio) + 
+  geom_bar(aes(x =Var2, y= Freq, fill = Var1),stat = "identity",width = 0.7,size = 0.5,colour = '#222222')+ 
+  theme_classic() +
+  labs(x='Sample',y = 'Ratio')+
+  # coord_flip()+
+  theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))

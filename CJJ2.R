@@ -68,14 +68,26 @@ write.table(PC_igh_prod_vgene_dedup$contig_id,
             quote = FALSE,
             row.names = FALSE,
             col.names = FALSE)
-DN_igblast <- read.delim("e:/P23042711/DN-B/DN_igh_valid_contig_igblast_annotation.tsv", 
+
+DN_igh_prod_vgene_dedup$group<-rep("DN",length(rownames(DN_igh_prod_vgene_dedup)))
+DP_igh_prod_vgene_dedup$group<-rep("DP",length(rownames(DP_igh_prod_vgene_dedup)))
+NB_igh_prod_vgene_dedup$group<-rep("NB",length(rownames(NB_igh_prod_vgene_dedup)))
+PC_igh_prod_vgene_dedup$group<-rep("PC",length(rownames(PC_igh_prod_vgene_dedup)))
+
+
+Total_igh_prod_vgene_dedup<-rbind(DN_igh_prod_vgene_dedup,DP_igh_prod_vgene_dedup,NB_igh_prod_vgene_dedup,PC_igh_prod_vgene_dedup)
+
+DN_igblast <- read.delim("e:/P23042711/DN-B/DN_igh_valid_contig_igblast_annotation_new_new_new.tsv", 
                       stringsAsFactors = FALSE)
-DP_igblast <- read.delim("e:/P23042711/DP-B/DP_igh_valid_contig_igblast_annotation.tsv", 
+DP_igblast <- read.delim("e:/P23042711/DP-B/DP_igh_valid_contig_igblast_annotation_new_new_new.tsv", 
                          stringsAsFactors = FALSE)
-NB_igblast <- read.delim("e:/P23042711/NB-B/NB_igh_valid_contig_igblast_annotation.tsv", 
+NB_igblast <- read.delim("e:/P23042711/NB-B/NB_igh_valid_contig_igblast_annotation_new_new_new.tsv", 
                          stringsAsFactors = FALSE)
-PC_igblast <- read.delim("e:/P23042711/PC-B/PC_igh_valid_contig_igblast_annotation.tsv", 
+PC_igblast <- read.delim("e:/P23042711/PC-B/PC_igh_valid_contig_igblast_annotation_new_new_new.tsv", 
                          stringsAsFactors = FALSE)
+Total_new_igblast <- read.delim("e:/P23042711/Total_igh_valid_contig_igblast_annotation_new_new_new.tsv", 
+                         stringsAsFactors = FALSE)
+
 DN_result <- DN_igblast %>% 
   dplyr::select(barcode = sequence_id,
                 chain = locus,
@@ -153,6 +165,11 @@ PC_result <- add_column(PC_result,
                         c_gene = PC_igh_prod_vgene_dedup$c_gene[match(PC_igblast$sequence_id, 
                                                                       PC_igh_prod_vgene_dedup$contig_id)], 
                         .after = "j_evalue")
+Total_new_igblast <- add_column(Total_new_igblast, 
+                        c_gene = Total_igh_prod_vgene_dedup$c_gene[match(Total_new_igblast$sequence_id, 
+                                                                      Total_igh_prod_vgene_dedup$contig_id)], 
+                        .after = "j_support")
+
 DN_result <- add_column(DN_result, 
                      length = sapply(strsplit(DN_igblast$sequence, ""), length), 
                      .after = "chain")
@@ -165,10 +182,16 @@ NB_result <- add_column(NB_result,
 PC_result <- add_column(PC_result, 
                         length = sapply(strsplit(PC_igblast$sequence, ""), length), 
                         .after = "chain")
+Total_new_igblast <- add_column(Total_new_igblast, 
+                        length = sapply(strsplit(Total_new_igblast$sequence, ""), length), 
+                        .after = "locus")
+
 DN_result$Total_length <- nchar(DN_igblast$v_sequence_alignment)
 DP_result$Total_length <- nchar(DP_igblast$v_sequence_alignment)
 NB_result$Total_length <- nchar(NB_igblast$v_sequence_alignment)
 PC_result$Total_length <- nchar(PC_igblast$v_sequence_alignment)
+Total_new_igblast$Total_length <- nchar(Total_new_igblast$v_sequence_alignment)
+
 DN_vgene_nt_match <- sapply(1:nrow(DN_igblast), function(x) {
   apply(do.call(rbind, strsplit(c(DN_igblast[x,]$v_sequence_alignment, DN_igblast[x,]$v_germline_alignment), "")), 
         2, 
@@ -208,7 +231,16 @@ PC_vgene_nt_match <- sapply(1:nrow(PC_igblast), function(x) {
   )
 }
 )
-PC_result$Total_match <- sapply(PC_vgene_nt_match, sum)
+Total_new_vgene_nt_match <- sapply(1:nrow(Total_new_igblast), function(x) {
+  apply(do.call(rbind, strsplit(c(Total_new_igblast[x,]$v_sequence_alignment, Total_new_igblast[x,]$v_germline_alignment), "")), 
+        2, 
+        function(i){
+          i[1] == i[2]
+        }
+  )
+}
+)
+Total_new_igblast$Total_match <- sapply(Total_new_vgene_nt_match, sum)
 DN_vgene_nt_mismatch <- sapply(1:nrow(DN_igblast), function(x) {
   apply(do.call(rbind, strsplit(c(DN_igblast[x,]$v_sequence_alignment, DN_igblast[x,]$v_germline_alignment), "")), 
         2, 
@@ -249,6 +281,17 @@ PC_vgene_nt_mismatch <- sapply(1:nrow(PC_igblast), function(x) {
 }
 )
 PC_result$Total_mismatch <- sapply(PC_vgene_nt_mismatch, sum)
+Total_new_vgene_nt_mismatch <- sapply(1:nrow(Total_new_igblast), function(x) {
+  apply(do.call(rbind, strsplit(c(Total_new_igblast[x,]$v_sequence_alignment, Total_new_igblast[x,]$v_germline_alignment), "")), 
+        2, 
+        function(i){
+          i[1] != i[2] & i[1] != "-" & i[2] != "-"
+        }
+  )
+}
+)
+Total_new_igblast$Total_mismatch <- sapply(Total_new_vgene_nt_mismatch, sum)
+
 DN_gap_query <- str_count(DN_igblast$v_sequence_alignment, "-")
 DN_gap_ref <- str_count(DN_igblast$v_germline_alignment, "-")
 DN_result <- DN_result %>%
@@ -273,6 +316,13 @@ PC_result <- PC_result %>%
   mutate(Total_diff = Total_length-Total_match,
          Total_gap = PC_gap_query + PC_gap_ref,
          Total_identity = Total_match/Total_length)
+Total_new_gap_query <- str_count(Total_new_igblast$v_sequence_alignment, "-")
+Total_new_gap_ref <- str_count(Total_new_igblast$v_germline_alignment, "-")
+Total_new_igblast <- Total_new_igblast %>%
+  mutate(Total_diff = Total_length-Total_match,
+         Total_gap = Total_new_gap_query + Total_new_gap_ref,
+         Total_identity = Total_match/Total_length)
+
 DN_result$indel <- ifelse(nchar(DN_igblast$v_sequence_alignment_aa)==nchar(DN_igblast$v_germline_alignment_aa), 
                        0, 
                        1)
@@ -285,10 +335,15 @@ DP_result$indel <- ifelse(nchar(DP_igblast$v_sequence_alignment_aa)==nchar(DP_ig
 PC_result$indel <- ifelse(nchar(PC_igblast$v_sequence_alignment_aa)==nchar(PC_igblast$v_germline_alignment_aa), 
                           0, 
                           1)
+Total_new_igblast$indel <- ifelse(nchar(Total_new_igblast$v_sequence_alignment_aa)==nchar(Total_new_igblast$v_germline_alignment_aa), 
+                          0, 
+                          1)
 DN_vgene_mutation_offset <- (DN_igblast$v_germline_start + 1) %/% 3
 DP_vgene_mutation_offset <- (DP_igblast$v_germline_start + 1) %/% 3
 NB_vgene_mutation_offset <- (NB_igblast$v_germline_start + 1) %/% 3
 PC_vgene_mutation_offset <- (PC_igblast$v_germline_start + 1) %/% 3
+Total_new_vgene_mutation_offset <- (Total_new_igblast$v_germline_start + 1) %/% 3
+
 DN_vgene_aa_match <- sapply(1:nrow(DN_igblast), function(x) {
   apply(do.call(rbind, strsplit(c(DN_igblast[x,]$v_sequence_alignment_aa, 
                                   DN_igblast[x,]$v_germline_alignment_aa), 
@@ -337,6 +392,19 @@ PC_vgene_aa_match <- sapply(1:nrow(PC_igblast), function(x) {
 }
 )
 PC_vgene_mutation_pos <- lapply(PC_vgene_aa_match, function(x) which(!x))
+Total_new_vgene_aa_match <- sapply(1:nrow(Total_new_igblast), function(x) {
+  apply(do.call(rbind, strsplit(c(Total_new_igblast[x,]$v_sequence_alignment_aa, 
+                                  Total_new_igblast[x,]$v_germline_alignment_aa), 
+                                "")), 
+        2, 
+        function(i){
+          i[1] == i[2]
+        }
+  )
+}
+)
+Total_new_vgene_mutation_pos <- lapply(Total_new_vgene_aa_match, function(x) which(!x))
+
 DN_vgene_mutation_pos <- lapply(1:nrow(DN_igblast), 
                              function(i) DN_vgene_mutation_pos[[i]] + 
                                DN_vgene_mutation_offset[i])
@@ -349,6 +417,10 @@ NB_vgene_mutation_pos <- lapply(1:nrow(NB_igblast),
 PC_vgene_mutation_pos <- lapply(1:nrow(PC_igblast), 
                                 function(i) PC_vgene_mutation_pos[[i]] + 
                                   PC_vgene_mutation_offset[i])
+Total_new_vgene_mutation_pos <- lapply(1:nrow(Total_new_igblast), 
+                                function(i) Total_new_vgene_mutation_pos[[i]] + 
+                                  Total_new_vgene_mutation_offset[i])
+
 library(Seurat)
 library(tidyverse)
 library(RColorBrewer)
@@ -499,7 +571,7 @@ for (i in 1:length(PC_DP_IGHG1_overlapVgene)) {
   }
 
 
-for (i in length(PC_DN_IGHG1_overlapVgene)) {
+for (i in 1:length(PC_DN_IGHG1_overlapVgene)) {
   for (j in 1:length(rownames(PC_DN_result_igblast_IGHG1))) {
     
       if(PC_DN_IGHG1_overlapVgene[i] == PC_DN_result_igblast_IGHG1$v_sequence_alignment[j]){
@@ -552,7 +624,7 @@ for (i in 1:length(PC_DP_IGHG2_overlapVgene)) {
 }
 
 
-for (i in length(PC_DN_IGHG2_overlapVgene)) {
+for (i in 1:length(PC_DN_IGHG2_overlapVgene)) {
   for (j in 1:length(rownames(PC_DN_result_igblast_IGHG2))) {
     
     if(PC_DN_IGHG2_overlapVgene[i] == PC_DN_result_igblast_IGHG2$v_sequence_alignment[j]){
@@ -587,7 +659,7 @@ ggplot(PC_DN_same_IGHG2_Cellratio) +
 # 
 # PC_DP_IGHG3_overlapVgene<-intersect(PC_igblast_IGHG3_vgene$v_sequence_alignment,DP_igblast_IGHG3_vgene$v_sequence_alignment)
 # PC_DN_IGHG3_overlapVgene<-intersect(PC_igblast_IGHG3_vgene$v_sequence_alignment,DN_igblast_IGHG3_vgene$v_sequence_alignment)
-# 
+
 # PC_DP_result_igblast_IGHG3<-Total_result_igblast_IGHG3[which(Total_result_igblast_IGHG3$group == "DP" | Total_result_igblast_IGHG3$group == "PC"),]
 # PC_DN_result_igblast_IGHG3<-Total_result_igblast_IGHG3[which(Total_result_igblast_IGHG3$group == "DN" | Total_result_igblast_IGHG3$group == "PC"),]
 # 
@@ -711,7 +783,7 @@ for (i in 1:length(PC_DP_IGHA1_overlapVgene)) {
 }
 
 
-for (i in length(PC_DN_IGHA1_overlapVgene)) {
+for (i in 1:length(PC_DN_IGHA1_overlapVgene)) {
   for (j in 1:length(rownames(PC_DN_result_igblast_IGHA1))) {
     
     if(PC_DN_IGHA1_overlapVgene[i] == PC_DN_result_igblast_IGHA1$v_sequence_alignment[j]){
@@ -817,7 +889,7 @@ for (i in 1:length(PC_DPTotal_overlapVgene)) {
 }
 
 
-for (i in length(PC_DNTotal_overlapVgene)) {
+for (i in 1:length(PC_DNTotal_overlapVgene)) {
   for (j in 1:length(rownames(PC_DN_result_igblastTotal))) {
     
     if(PC_DNTotal_overlapVgene[i] == PC_DN_result_igblastTotal$v_sequence_alignment[j]){
@@ -870,7 +942,7 @@ for (i in 1:length(PC_DP_IGHM_overlapVgene)) {
 }
 
 
-for (i in length(PC_DN_IGHM_overlapVgene)) {
+for (i in 1:length(PC_DN_IGHM_overlapVgene)) {
   for (j in 1:length(rownames(PC_DN_result_igblast_IGHM))) {
     
     if(PC_DN_IGHM_overlapVgene[i] == PC_DN_result_igblast_IGHM$v_sequence_alignment[j]){
@@ -897,3 +969,213 @@ ggplot(PC_DN_same_IGHM_Cellratio) +
   labs(x='Sample',y = 'Ratio')+
   # coord_flip()+
   theme(panel.border = element_rect(fill=NA,color="black", size=0.5, linetype="solid"))
+
+library(alakazam)
+library(dowser)
+library(dplyr)
+library(scales)
+library(shazam)
+DN_igblast$group<-rep("DN",length(rownames(DN_igblast)))
+DP_igblast$group<-rep("DP",length(rownames(DP_igblast)))
+NB_igblast$group<-rep("NB",length(rownames(NB_igblast)))
+PC_igblast$group<-rep("PC",length(rownames(PC_igblast)))
+Total_igblast<-rbind(DN_igblast,DP_igblast,NB_igblast,PC_igblast)
+NB_dist_ham <- distToNearest(Total_igblast %>% filter(group == "NB"), 
+                          sequenceColumn="junction", 
+                          vCallColumn="v_call", jCallColumn="j_call",
+                          model="ham", normalize="len", nproc=1)
+DN_dist_ham <- distToNearest(Total_igblast %>% filter(group == "DN"), 
+                             sequenceColumn="junction", 
+                             vCallColumn="v_call", jCallColumn="j_call",
+                             model="ham", normalize="len", nproc=1)
+DP_dist_ham <- distToNearest(Total_igblast %>% filter(group == "DP"), 
+                             sequenceColumn="junction", 
+                             vCallColumn="v_call", jCallColumn="j_call",
+                             model="ham", normalize="len", nproc=1)
+PC_dist_ham <- distToNearest(Total_igblast %>% filter(group == "PC"), 
+                             sequenceColumn="junction", 
+                             vCallColumn="v_call", jCallColumn="j_call",
+                             model="ham", normalize="len", nproc=1)
+NB_dist_s5f <- distToNearest(Total_igblast %>% filter(group == "NB"), 
+                          sequenceColumn="junction", 
+                          vCallColumn="v_call", jCallColumn="j_call",
+                          model="hh_s5f", normalize="none", nproc=1)
+DN_dist_s5f <- distToNearest(Total_igblast %>% filter(group == "DN"), 
+                             sequenceColumn="junction", 
+                             vCallColumn="v_call", jCallColumn="j_call",
+                             model="hh_s5f", normalize="none", nproc=1)
+DP_dist_s5f <- distToNearest(Total_igblast %>% filter(group == "DP"), 
+                             sequenceColumn="junction", 
+                             vCallColumn="v_call", jCallColumn="j_call",
+                             model="hh_s5f", normalize="none", nproc=1)
+PC_dist_s5f <- distToNearest(Total_igblast %>% filter(group == "PC"), 
+                             sequenceColumn="junction", 
+                             vCallColumn="v_call", jCallColumn="j_call",
+                             model="hh_s5f", normalize="none", nproc=1)
+library(ggplot2)
+p1 <- ggplot(subset(NB_dist_ham, !is.na(dist_nearest)),
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("Hamming distance") + 
+  ylab("Count") +
+  scale_x_continuous(breaks=seq(0, 1, 0.1)) +
+  geom_histogram(color="white", binwidth=0.02) +
+  geom_vline(xintercept=0.12, color="firebrick", linetype=2)
+plot(p1)
+p2 <- ggplot(subset(NB_dist_s5f, !is.na(dist_nearest)),
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("HH_S5F distance") + 
+  ylab("Count") +
+  scale_x_continuous(breaks=seq(0, 50, 5)) +
+  geom_histogram(color="white", binwidth=1) +
+  geom_vline(xintercept=7, color="firebrick", linetype=2)
+plot(p2)
+output <- findThreshold(NB_dist_ham$dist_nearest, method="density")
+threshold <- output@threshold
+plot(output, title="Density Method")
+print(output)
+output <- findThreshold(NB_dist_ham$dist_nearest, method="gmm", model="gamma-gamma")
+plot(output, binwidth=0.02, title="GMM Method: gamma-gamma")
+print(output)
+
+library(ggplot2)
+p1 <- ggplot(subset(DN_dist_ham, !is.na(dist_nearest)),
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("Hamming distance") + 
+  ylab("Count") +
+  scale_x_continuous(breaks=seq(0, 1, 0.1)) +
+  geom_histogram(color="white", binwidth=0.02) +
+  geom_vline(xintercept=0.12, color="firebrick", linetype=2)
+plot(p1)
+p2 <- ggplot(subset(DN_dist_s5f, !is.na(dist_nearest)),
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("HH_S5F distance") + 
+  ylab("Count") +
+  scale_x_continuous(breaks=seq(0, 50, 5)) +
+  geom_histogram(color="white", binwidth=1) +
+  geom_vline(xintercept=7, color="firebrick", linetype=2)
+plot(p2)
+output <- findThreshold(DN_dist_ham$dist_nearest, method="density")
+threshold <- output@threshold
+plot(output, title="Density Method")
+print(output)
+output <- findThreshold(DN_dist_ham$dist_nearest, method="gmm", model="gamma-gamma")
+plot(output, binwidth=0.02, title="GMM Method: gamma-gamma")
+print(output)
+
+library(ggplot2)
+p1 <- ggplot(subset(DP_dist_ham, !is.na(dist_nearest)),
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("Hamming distance") + 
+  ylab("Count") +
+  scale_x_continuous(breaks=seq(0, 1, 0.1)) +
+  geom_histogram(color="white", binwidth=0.02) +
+  geom_vline(xintercept=0.12, color="firebrick", linetype=2)
+plot(p1)
+p2 <- ggplot(subset(DP_dist_s5f, !is.na(dist_nearest)),
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("HH_S5F distance") + 
+  ylab("Count") +
+  scale_x_continuous(breaks=seq(0, 50, 5)) +
+  geom_histogram(color="white", binwidth=1) +
+  geom_vline(xintercept=7, color="firebrick", linetype=2)
+plot(p2)
+output <- findThreshold(DP_dist_ham$dist_nearest, method="density")
+threshold <- output@threshold
+plot(output, title="Density Method")
+print(output)
+output <- findThreshold(DP_dist_ham$dist_nearest, method="gmm", model="gamma-gamma")
+plot(output, binwidth=0.02, title="GMM Method: gamma-gamma")
+print(output)
+
+library(ggplot2)
+p1 <- ggplot(subset(PC_dist_ham, !is.na(dist_nearest)),
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("Hamming distance") + 
+  ylab("Count") +
+  scale_x_continuous(breaks=seq(0, 1, 0.1)) +
+  geom_histogram(color="white", binwidth=0.02) +
+  geom_vline(xintercept=0.12, color="firebrick", linetype=2)
+plot(p1)
+p2 <- ggplot(subset(PC_dist_s5f, !is.na(dist_nearest)),
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("HH_S5F distance") + 
+  ylab("Count") +
+  scale_x_continuous(breaks=seq(0, 50, 5)) +
+  geom_histogram(color="white", binwidth=1) +
+  geom_vline(xintercept=7, color="firebrick", linetype=2)
+plot(p2)
+output <- findThreshold(PC_dist_ham$dist_nearest, method="density")
+threshold <- output@threshold
+plot(output, title="Density Method")
+print(output)
+output <- findThreshold(PC_dist_ham$dist_nearest, method="gmm", model="gamma-gamma")
+plot(output, binwidth=0.02, title="GMM Method: gamma-gamma")
+print(output)
+
+
+dist_fields <- distToNearest(Total_igblast, model="ham", normalize="len", 
+                             fields="group", nproc=1)
+p4 <- ggplot(subset(dist_fields, !is.na(dist_nearest)), 
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("Grouped Hamming distance") + 
+  ylab("Count") +
+  geom_histogram(color="white", binwidth=0.02) +
+  geom_vline(xintercept=0.12, color="firebrick", linetype=2) +
+  facet_grid(group ~ ., scales="free_y")
+plot(p4)
+dist_cross <- distToNearest(Total_igblast, sequenceColumn="junction", 
+                            vCallColumn="v_call", jCallColumn="j_call",
+                            model="ham", first=FALSE, 
+                            normalize="len", cross="group", nproc=1)
+p5 <- ggplot(subset(dist_cross, !is.na(cross_dist_nearest)), 
+             aes(x=cross_dist_nearest)) + 
+  theme_bw() + 
+  xlab("Cross-sample Hamming distance") + 
+  ylab("Count") +
+  geom_histogram(color="white", binwidth=0.02) +
+  geom_vline(xintercept=0.12, color="firebrick", linetype=2) +
+  facet_grid(group ~ ., scales="free_y")
+plot(p5)
+library(tigger)
+
+Total_new_igblast$Total<-rep(1,length(rownames(Total_new_igblast)))
+Total_new_igblast$Total_unidentify<-Total_new_igblast$Total - Total_new_igblast$Total_identity
+
+Total_new_igblast_new<-Total_new_igblast[Total_new_igblast$c_gene != "",]
+Total_new_igblast_new$group<-factor(Total_new_igblast_new$group,levels = c("NB","DN","DP","PC"))
+Total_new_igblast_new<-Total_new_igblast_new[which(Total_new_igblast_new$c_gene == "IGHA1" | Total_new_igblast_new$c_gene == "IGHA2" | Total_new_igblast_new$c_gene == "IGHG1" | Total_new_igblast_new$c_gene == "IGHG2" | Total_new_igblast_new$c_gene == "IGHG3" | Total_new_igblast_new$c_gene == "IGHG4" | Total_new_igblast_new$c_gene == "IGHM" ),]
+Total_new_igblast_new$c_gene<-factor(Total_new_igblast_new$c_gene,levels = c("IGHM","IGHA1","IGHA2","IGHG1","IGHG2","IGHG3","IGHG4"))
+
+DN_new_igblast_new<-Total_new_igblast_new[which(Total_new_igblast_new$group == "DN" ),]
+DP_new_igblast_new<-Total_new_igblast_new[which(Total_new_igblast_new$group == "DP" ),]
+NB_new_igblast_new<-Total_new_igblast_new[which(Total_new_igblast_new$group == "NB" ),]
+PC_new_igblast_new<-Total_new_igblast_new[which(Total_new_igblast_new$group == "PC" ),]
+
+PC_DP_new_igblast_new_overlapclone<-intersect(PC_new_igblast_new$clone_id,DP_new_igblast_new$clone_id)
+PC_DP_DN_new_igblast_new_overlapclone<-intersect(PC_DP_new_igblast_new_overlapclone,DN_new_igblast_new$clone_id)
+PC_DP_DN_NB_new_igblast_new_overlapclone<-intersect(PC_DP_DN_new_igblast_new_overlapclone,NB_new_igblast_new$clone_id)
+
+clone_number<-as.data.frame(table(Total_new_igblast_new$clone_id))
+clone_use<-clone_number[which(clone_number$Freq >2 ),]
+clone_use<-clone_use$Var1
+Total_new_igblast_new$Hits<-"No_Hit"
+for (i in 1:length(clone_use)) {
+  for (j in 1:length(rownames(Total_new_igblast_new))) {
+    
+    if(clone_use[i] == Total_new_igblast_new$clone_id[j]){
+      Total_new_igblast_new$Hits[j]<-"Hit"      
+    }
+  }
+  
+}
+Total_new_igblast_new_clone_use<-Total_new_igblast_new[which(Total_new_igblast_new$Hits == "Hit"),]
+write.table(Total_new_igblast_new_clone_use,file = "e:/P23042711/Total_new_clone_use.txt",sep = "\t")

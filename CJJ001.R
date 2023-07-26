@@ -76,7 +76,7 @@ PC_igh_prod_vgene_dedup$group<-rep("PC",length(rownames(PC_igh_prod_vgene_dedup)
 
 
 Total_igh_prod_vgene_dedup<-rbind(DN_igh_prod_vgene_dedup,DP_igh_prod_vgene_dedup,NB_igh_prod_vgene_dedup,PC_igh_prod_vgene_dedup)
-
+###down no use
 NB_prod <- NB[NB$productive == "True",]
 DN_prod <- DN[DN$productive == "True",]
 DP_prod <- DP[DP$productive == "True",]
@@ -140,7 +140,7 @@ PC_prod_vgene_dedup$group<-rep("PC",length(rownames(PC_prod_vgene_dedup)))
 
 
 Total_prod_vgene_dedup<-rbind(DN_prod_vgene_dedup,DP_prod_vgene_dedup,NB_prod_vgene_dedup,PC_prod_vgene_dedup)
-
+####up no use
 library(dplyr)
 library(tidyverse)
 DN_igblast <- read.delim("e:/P23042711/DN-B/DN_blast_01_db-pass.tsv", 

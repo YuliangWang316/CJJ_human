@@ -140,7 +140,7 @@ PC_prod_vgene_dedup$group<-rep("PC",length(rownames(PC_prod_vgene_dedup)))
 
 
 Total_prod_vgene_dedup<-rbind(DN_prod_vgene_dedup,DP_prod_vgene_dedup,NB_prod_vgene_dedup,PC_prod_vgene_dedup)
-####up no use
+####up no use down nouse
 library(dplyr)
 library(tidyverse)
 DN_igblast <- read.delim("e:/P23042711/DN-B/DN_blast_01_db-pass.tsv", 
@@ -289,3 +289,5 @@ for (i in 1:length(clone_use)) {
 }
 Total_igblast_new_clone_use<-Total_igblast_new[which(Total_igblast_new$Hits == "Hit"),]
 write.table(Total_igblast_new_clone_use,file = "e:/P23042711/Total_clone_use.txt",sep = "\t")
+#up nouse
+

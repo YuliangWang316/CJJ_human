@@ -1,3 +1,4 @@
+# down no use
 library(dplyr)
 library(tidyverse)
 DN_heavy <- read.delim("e:/P23042711/DN-B/heavy_parse-select.tsv", 
@@ -94,7 +95,7 @@ output <- findThreshold(PC_heavy_dist_ham$dist_nearest, method="density")
 threshold <- output@threshold
 plot(output, title="Density Method")
 print(output)
-
+# up no use
 
 ###
 # library(dplyr)

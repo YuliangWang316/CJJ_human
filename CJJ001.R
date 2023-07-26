@@ -290,4 +290,71 @@ for (i in 1:length(clone_use)) {
 Total_igblast_new_clone_use<-Total_igblast_new[which(Total_igblast_new$Hits == "Hit"),]
 write.table(Total_igblast_new_clone_use,file = "e:/P23042711/Total_clone_use.txt",sep = "\t")
 #up nouse
+#down use
+library(dplyr)
+library(tidyverse)
+DN_igblast <- read.delim("e:/P23042711/DN-B/20230706/Result/05.match/heavy_parse-select.tsv", 
+                         stringsAsFactors = FALSE)
+DP_igblast <- read.delim("e:/P23042711/DP-B/20230706/Result/05.match/heavy_parse-select.tsv", 
+                         stringsAsFactors = FALSE)
+NB_igblast <- read.delim("e:/P23042711/NB-B/20230706/Result/05.match/heavy_parse-select.tsv", 
+                         stringsAsFactors = FALSE)
+PC_igblast <- read.delim("e:/P23042711/PC-B/20230706/Result/05.match/heavy_parse-select.tsv", 
+                         stringsAsFactors = FALSE)
+DN_igblast$group<-rep("DN",length(rownames(DN_igblast)))
+DP_igblast$group<-rep("DP",length(rownames(DP_igblast)))
+NB_igblast$group<-rep("NB",length(rownames(NB_igblast)))
+PC_igblast$group<-rep("PC",length(rownames(PC_igblast)))
+Total_igblast<-rbind(DN_igblast,DP_igblast,NB_igblast,PC_igblast)
+write.table(Total_igblast,file = "e:/P23042711/Total.txt",sep = "\t")
+# library(tigger)
+# novel <- findNovelAlleles(Total_igblast, SampleGermlineIGHV, nproc=40)
+# novel_rows <- selectNovel(novel)
+# novel_row <- which(!is.na(novel$polymorphism_call))[1]
+# plotNovel(AIRRDb, novel[novel_row, ])
+
+library(alakazam)
+library(dowser)
+library(dplyr)
+library(scales)
+library(shazam)
+Total_dist_ham <- distToNearest(Total_igblast , 
+                                sequenceColumn="junction", 
+                                vCallColumn="v_call", jCallColumn="j_call",
+                                model="ham", normalize="len", nproc=40)
+Total_dist_s5f <- distToNearest(Total_igblast, 
+                                sequenceColumn="junction", 
+                                vCallColumn="v_call", jCallColumn="j_call",
+                                model="hh_s5f", normalize="none", nproc=40)
+library(ggplot2)
+p1 <- ggplot(subset(Total_dist_ham, !is.na(dist_nearest)),
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("Hamming distance") + 
+  ylab("Count") +
+  scale_x_continuous(breaks=seq(0, 1, 0.1)) +
+  geom_histogram(color="white", binwidth=0.02) +
+  geom_vline(xintercept=0.12, color="firebrick", linetype=2)
+plot(p1)
+p2 <- ggplot(subset(Total_dist_s5f, !is.na(dist_nearest)),
+             aes(x=dist_nearest)) + 
+  theme_bw() + 
+  xlab("HH_S5F distance") + 
+  ylab("Count") +
+  scale_x_continuous(breaks=seq(0, 50, 5)) +
+  geom_histogram(color="white", binwidth=1) +
+  geom_vline(xintercept=7, color="firebrick", linetype=2)
+plot(p2)
+output <- findThreshold(Total_dist_ham$dist_nearest, method="density")
+threshold <- output@threshold
+plot(output, title="Density Method")
+print(output)
+output <- findThreshold(Total_dist_ham$dist_nearest, method="gmm", model="gamma-gamma")
+plot(output, binwidth=0.02, title="GMM Method: gamma-gamma")
+print(output)
+
+Total_new_igblast<-Total_igblast[Total_igblast$c_call != "",]
+Total_new_igblast$group<-factor(Total_new_igblast$group,levels = c("NB","DN","DP","PC"))
+Total_new_igblast<-Total_new_igblast[which(Total_new_igblast$c_call == "IGHA1" | Total_new_igblast$c_call == "IGHA2" | Total_new_igblast$c_call == "IGHG1" | Total_new_igblast$c_call == "IGHG2" | Total_new_igblast$c_call == "IGHG3" | Total_new_igblast$c_call == "IGHG4" | Total_new_igblast$c_call== "IGHM" ),]
+  Total_new_igblast$c_call<-factor(Total_new_igblast$c_call,levels = c("IGHM","IGHA1","IGHA2","IGHG1","IGHG2","IGHG3","IGHG4"))
 

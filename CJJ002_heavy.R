@@ -113,6 +113,16 @@ print(output)
 # library(dplyr)
 # library(scales)
 # library(shazam)
+multi_heavy <- table(filter(DN_heavy_new, locus == "IGH")$cell_id)
+multi_heavy_cells <- names(multi_heavy)[multi_heavy > 1]
+
+DN_heavy_new <- filter(DN_heavy_new, !cell_id %in% multi_heavy_cells)
+heavy_cells <- filter(DN_heavy_new, locus == "IGH")$cell_id
+light_cells <- filter(DN_heavy_new, locus == "IGK" | locus == "IGL")$cell_id
+no_heavy_cells <- light_cells[which(!light_cells %in% heavy_cells)]
+
+DN_heavy_new <- filter(DN_heavy_new, !cell_id %in% no_heavy_cells)
+
 # DN_heavy_new_dist_ham <- distToNearest(DN_heavy_new , 
 #                                        cellIdColumn="cell_id", locusColumn="locus", 
 #                                        VJthenLen=FALSE, onlyHeavy=FALSE, nproc=40)
@@ -132,7 +142,16 @@ print(output)
 # plot(output, title="Density Method")
 # print(output)
 # 
-# 
+multi_heavy <- table(filter(DP_heavy_new, locus == "IGH")$cell_id)
+multi_heavy_cells <- names(multi_heavy)[multi_heavy > 1]
+
+DP_heavy_new <- filter(DP_heavy_new, !cell_id %in% multi_heavy_cells)
+heavy_cells <- filter(DP_heavy_new, locus == "IGH")$cell_id
+light_cells <- filter(DP_heavy_new, locus == "IGK" | locus == "IGL")$cell_id
+no_heavy_cells <- light_cells[which(!light_cells %in% heavy_cells)]
+
+DP_heavy_new <- filter(DP_heavy_new, !cell_id %in% no_heavy_cells)
+
 # DP_heavy_new_dist_ham <- distToNearest(DP_heavy_new , 
 #                                        cellIdColumn="cell_id", locusColumn="locus", 
 #                                        VJthenLen=FALSE, onlyHeavy=FALSE, nproc=40)
@@ -152,7 +171,17 @@ print(output)
 # plot(output, title="Density Method")
 # print(output)
 # 
-# 
+multi_heavy <- table(filter(NB_heavy_new, locus == "IGH")$cell_id)
+multi_heavy_cells <- names(multi_heavy)[multi_heavy > 1]
+
+NB_heavy_new <- filter(NB_heavy_new, !cell_id %in% multi_heavy_cells)
+heavy_cells <- filter(NB_heavy_new, locus == "IGH")$cell_id
+light_cells <- filter(NB_heavy_new, locus == "IGK" | locus == "IGL")$cell_id
+no_heavy_cells <- light_cells[which(!light_cells %in% heavy_cells)]
+
+NB_heavy_new <- filter(NB_heavy_new, !cell_id %in% no_heavy_cells)
+
+
 # NB_heavy_new_dist_ham <- distToNearest(NB_heavy_new , 
 #                                        cellIdColumn="cell_id", locusColumn="locus", 
 #                                        VJthenLen=FALSE, onlyHeavy=FALSE, nproc=40)
@@ -172,7 +201,17 @@ print(output)
 # plot(output, title="Density Method")
 # print(output)
 # 
-# 
+multi_heavy <- table(filter(PC_heavy_new, locus == "IGH")$cell_id)
+multi_heavy_cells <- names(multi_heavy)[multi_heavy > 1]
+
+PC_heavy_new <- filter(PC_heavy_new, !cell_id %in% multi_heavy_cells)
+heavy_cells <- filter(PC_heavy_new, locus == "IGH")$cell_id
+light_cells <- filter(PC_heavy_new, locus == "IGK" | locus == "IGL")$cell_id
+no_heavy_cells <- light_cells[which(!light_cells %in% heavy_cells)]
+
+PC_heavy_new <- filter(PC_heavy_new, !cell_id %in% no_heavy_cells)
+
+
 # PC_heavy_new_dist_ham <- distToNearest(PC_heavy_new , 
 #                                        cellIdColumn="cell_id", locusColumn="locus", 
 #                                        VJthenLen=FALSE, onlyHeavy=FALSE, nproc=40)

@@ -18,7 +18,7 @@ SHARE<-read.table("E:/P23042711/2_NEW.txt",sep = "\t",header = TRUE)
 
 Total$two<-"No_Hit"
 
-for (i in 1:92) {
+for (i in 1:93) {
   for (j in 1:length(rownames(Total))) {
     
     if(SHARE$DN_PC[i] ==  Total$clone_id[j] ){
@@ -46,28 +46,28 @@ plots_two_pml=plotTrees(clones_two_pml, tips="group")
 plots_two_dnaml=plotTrees(clones_two_dnaml, tips="group")
 
 
-for (i in 1:92) {
+for (i in 1:93) {
   a<-plots_two_1[[i]][["labels"]][["title"]]
   pdf(paste0("Total_two_1_",i,"_",a,".pdf"))
   remove(a)
   print(plots_two_1[[i]])
   dev.off()
 }
-for (i in 1:92) {
+for (i in 1:93) {
   a<-plots_two_phylip[[i]][["labels"]][["title"]]
   pdf(paste0("Total_two_phylip_",i,"_",a,".pdf"))
   remove(a)
   print(plots_two_phylip[[i]])
   dev.off()
 }
-for (i in 1:90) {
+for (i in 1:91) {
   a<-plots_two_pml[[i]][["labels"]][["title"]]
   pdf(paste0("Total_two_pml_",i,"_",a,".pdf"))
   remove(a)
   print(plots_two_pml[[i]])
   dev.off()
 }
-for (i in 1:92) {
+for (i in 1:93) {
   a<-plots_two_dnaml[[i]][["labels"]][["title"]]
   pdf(paste0("Total_two_dnaml_",i,"_",a,".pdf"))
   remove(a)
